@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="de">
+
+<head>
+  <title>Interaktives Zeichenspiel</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+  <div id="chat-container">
+    <h1>Interaktives Zeichenspiel</h1>
+    <div id="client-index"></div>
+  </div>
+  <div id="title-display"></div>
+  <div id="message-display"></div>
+  <div class="main-flex">
+    <div class="canvas-column">
+      <canvas id="canvas" width="800" height="500"></canvas>
+      <div class="controls">
+        <button id="clearBtn">Leeren</button>
+        <input type="color" id="colorPicker" value="#000000">
+        <input type="range" id="brushSize" min="1" max="40" value="4">
+      </div>
+    </div>
+    <div class="chat-column">
+      <div id="messages">
+        <textarea id="messages-textarea" rows="10" cols="40" readonly></textarea>
+      </div>
+      <div id="input-row">
+        <input type="text" id="message-input" placeholder="Nachricht eingeben..." />
+        <button id="send-button">Senden</button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

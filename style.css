@@ -1,0 +1,217 @@
+/* Grundlegende Schrift und Farben */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+  background: linear-gradient(135deg, #f8ffae 0%, #b6e9ff 100%);
+  min-height: 100vh;
+  color: #222;
+}
+
+/* Header */
+#chat-container {
+  background: linear-gradient(90deg,#fdc4b1 0%, #ffecd2 50%, #fdc4b1 100%);
+  padding: 0.7rem 1rem 0.5rem 1rem;
+  border-bottom-left-radius: 1.2rem;
+  border-bottom-right-radius: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+#chat-container h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #ff6a00;
+  text-shadow: 1px 2px 8px #fff7;
+}
+
+/* Flex-Layout */
+.main-flex {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0 1rem 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+/* Canvas-Spalte */
+.canvas-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 2 1 400px;
+  min-width: 320px;
+}
+
+#canvas {
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px 0 #43cea255;
+  background: #fff;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  aspect-ratio: 16/10;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.controls button,
+#send-button {
+  background: linear-gradient(90deg, #28b849 0%, #21b72b 50%, #28b849 100%);
+  color: #ffffffed;
+  border: none;
+  border-radius: 1.2rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #43cea244;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.controls button:hover,
+#send-button:hover {
+  background: linear-gradient(90deg, #ff6a00 0%, #f7971e 50%, #ff6a00 100%);
+  color: #573307;
+  transform: translateY(-2px) scale(1.04);
+}
+
+#colorPicker {
+  border: none;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px #43cea244;
+  cursor: pointer;
+}
+
+#brushSize {
+  accent-color: #43cea2;
+}
+
+/* Chat-Spalte */
+.chat-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 320px;
+  min-width: 260px;
+  max-width: 400px;
+  height: 100%;
+  min-height: 0;
+}
+
+#messages {
+  flex: 1 1 auto;
+  margin-bottom: 1rem;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#messages-textarea {
+  width: 100%;
+  height: 100%;
+  max-width: 370px;
+  /* Entferne min-height, damit es flexibel ist: */
+  /* min-height: 385px; */
+  border-radius: 1rem;
+  border: none;
+  padding: 1rem;
+  font-size: 1rem;
+  background: rgb(221, 255, 236);
+  backdrop-filter: blur(6px);
+  color: #222;
+  resize: none;
+  box-shadow: 0 2px 8px #43cea244;
+  /* Neu: */
+  flex: 1 1 auto;
+  min-height: 80px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+#input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+#message-input {
+  flex: 1 1 auto;
+  border-radius: 1rem;
+  border: none;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 8px #43cea244;
+}
+
+#send-button {
+  min-width: 90px;
+}
+
+#client-index {
+  color: #704410;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .main-flex {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+  .canvas-column, .chat-column {
+    max-width: 100%;
+  }
+  .chat-column {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  #chat-container h1 {
+    font-size: 1.3rem;
+  }
+  .controls button,
+  #send-button {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+  }
+  #canvas {
+    max-width: 100vw;
+    min-width: 0;
+  }
+  .main-flex {
+    padding: 0 0.2rem;
+  }
+  #messages-textarea {
+    min-height: 120px;
+    font-size: 0.95rem;
+    padding: 0.7rem;
+  }
+  #message-input {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.7rem;
+  }
+}
+
+button:active {
+  transform: scale(0.97);
+}
