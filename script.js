@@ -39,9 +39,21 @@ messageElem.innerText = '';
 
 // Canvas-Größe anpassen
 function resizeCanvas() {
-  const width = Math.min(window.innerWidth - 40, 800); // Maximal 800px breit, sonst kleiner
+  // Seitenverhältnis wie im CSS (16:10)
+  const maxWidth = Math.min(window.innerWidth - 40, 800);
+  const aspect = 16 / 10;
+  let width = maxWidth;
+  let height = Math.round(width / aspect);
+
+  // Auf kleinen Bildschirmen: Höhe darf nicht größer als 35% der Viewport-Höhe sein
+  const maxHeight = Math.round(window.innerHeight * 0.35);
+  if (height > maxHeight) {
+    height = maxHeight;
+    width = Math.round(height * aspect);
+  }
+
   canvas.width = width;
-  canvas.height = 500; // Höhe bleibt immer gleich
+  canvas.height = height;
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
