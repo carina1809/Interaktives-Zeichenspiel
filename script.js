@@ -3,9 +3,9 @@
 // =====================
 const titleElem = document.getElementById('title-display'); // Überschrift
 const messageElem = document.getElementById('message-display'); // Nachrichtenanzeige
-const indexElem = document.getElementById('client-index'); // Zeigt die Nummer des Teilnehmers an
-const canvas = document.getElementById('canvas'); // Das Zeichenfeld
-const context = canvas.getContext('2d'); // Das "Werkzeug", mit dem wir auf das Canvas zeichnen können
+const indexElem = document.getElementById('client-index'); // Teilnehmernummer-Anzeige
+const canvas = document.getElementById('canvas'); // Zeichenfläche
+const context = canvas.getContext('2d'); // Zeichenkontext
 const clearBtn = document.getElementById('clearBtn'); // "Leeren"-Button
 const colorPickerBtn = document.getElementById('colorPickerBtn');
 const colorPicker = document.getElementById('colorPicker');
@@ -17,35 +17,29 @@ const messagesTextarea = document.getElementById('messages-textarea');
 // =====================
 // 2. Globale Variablen
 // =====================
-const webRoomsWebSocketServerAddr = 'https://nosch.uber.space/web-rooms/'; // Adresse des Servers
-let clientId = null; // Die eigene Teilnehmernummer
-let clientCount = 0; // Wie viele Teilnehmer sind insgesamt da
-let pointerId = null; // Merkt sich, ob gerade gezeichnet wird
+const webRoomsWebSocketServerAddr = 'https://nosch.uber.space/web-rooms/';
+let clientId = null;
+let clientCount = 0;
+let pointerId = null;
 const touches = new Map(); // Speichert alle Linien aller Teilnehmer
-let currentLine = null; // Die Linie, die gerade gezeichnet wird
-let clearLockedUntil = 0; // Bis wann ist der Button gesperrt?
+let currentLine = null;
+let clearLockedUntil = 0;
 let clearLockTimeout = null;
 let clearBtnDefaultText = 'Leeren';
 let clearLockCountdownInterval = null;
-const chatHistory = []; // Speichert alle Chat-Nachrichten
-let hasDrawnSinceClear = false; // <--- NEU
+const chatHistory = []; // Chat-Verlauf
+let hasDrawnSinceClear = false; // Wurde seit dem letzten Leeren gezeichnet?
 
 // =====================
-// 3. Spiel vorbereiten
+// 3. Canvas-Größe anpassen
 // =====================
-// Anfangszustand: Überschrift und Nachricht leer machen
-titleElem.innerText = '';
-messageElem.innerText = '';
-
-// Canvas-Größe anpassen
 function resizeCanvas() {
-  // Seitenverhältnis wie im CSS (16:10)
+  // Seitenverhältnis 16:10, max. 800px breit, max. 35% Viewport-Höhe
   const maxWidth = Math.min(window.innerWidth - 40, 800);
   const aspect = 16 / 10;
   let width = maxWidth;
   let height = Math.round(width / aspect);
 
-  // Auf kleinen Bildschirmen: Höhe darf nicht größer als 35% der Viewport-Höhe sein
   const maxHeight = Math.round(window.innerHeight * 0.35);
   if (height > maxHeight) {
     height = maxHeight;
@@ -63,12 +57,12 @@ resizeCanvas();
 // =====================
 function start() {
   resizeCanvas();
-  // Pointer-Events
+  // Pointer-Events für Zeichnen
   canvas.addEventListener('pointerdown', onPointerDown);
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerup', onPointerUp);
   canvas.addEventListener('pointercancel', onPointerUp);
-  // Touch-Events verhindern das Scrollen auf dem Handy
+  // Touch-Events verhindern Scrollen auf Mobilgeräten
   canvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
   canvas.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
   requestAnimationFrame(onAnimationFrame);
@@ -89,10 +83,10 @@ function onPointerDown(e) {
     touches.get(clientId).push(currentLine);
     updateClearButtonState();
     sendRequest('*broadcast-message*', ['start', clientId, x, y, color, size, createdAt]);
-    // Sperre nur setzen, wenn Canvas frisch geleert wurde:
+    // Sperre nur setzen, wenn Canvas frisch geleert wurde
     if (!hasDrawnSinceClear && clearLockedUntil < Date.now()) {
       hasDrawnSinceClear = true;
-      const lockUntil = Date.now() + 90000; // 80 Sekunden Sperrzeit
+      const lockUntil = Date.now() + 90000; // 90 Sekunden Sperrzeit
       sendRequest('*broadcast-message*', ['clear-lock', lockUntil]);
       lockClearButtonUntil(lockUntil);
     }
@@ -121,20 +115,20 @@ function onPointerUp(e) {
   }
 }
 
+// Zeichnet alle Linien auf das Canvas
 function onAnimationFrame() {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Alle Linien aus allen Clients in ein Array sammeln
+  // Linien aller Clients sammeln und nach Zeit sortieren
   let allLines = [];
   for (let lines of touches.values()) {
     for (let line of lines) {
       allLines.push(line);
     }
   }
-  // Nach createdAt sortieren (älteste zuerst, neueste zuletzt)
   allLines.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
-  // Jetzt in dieser Reihenfolge zeichnen
+  // Linien zeichnen
   for (let line of allLines) {
     if (line.points.length > 1) {
       context.save();
@@ -156,6 +150,8 @@ function onAnimationFrame() {
 // =====================
 // 5. Clear-Button-Logik
 // =====================
+
+// Sperrt den Clear-Button bis zum angegebenen Zeitpunkt
 function lockClearButtonUntil(timestamp) {
   clearLockedUntil = timestamp;
   updateClearButtonState();
@@ -171,6 +167,7 @@ function lockClearButtonUntil(timestamp) {
   }
 }
 
+// Aktualisiert den Zustand des Clear-Buttons
 function updateClearButtonState() {
   let hasLines = false;
   for (const lines of touches.values()) {
@@ -191,12 +188,14 @@ function updateClearButtonState() {
   }
 }
 
+// Startet Countdown-Anzeige auf dem Button
 function startClearLockCountdown() {
   stopClearLockCountdown();
   updateClearLockCountdownText();
   clearLockCountdownInterval = setInterval(updateClearLockCountdownText, 250);
 }
 
+// Stoppt Countdown-Anzeige
 function stopClearLockCountdown() {
   if (clearLockCountdownInterval) {
     clearInterval(clearLockCountdownInterval);
@@ -204,6 +203,7 @@ function stopClearLockCountdown() {
   }
 }
 
+// Aktualisiert Countdown-Text auf dem Button
 function updateClearLockCountdownText() {
   const msLeft = clearLockedUntil - Date.now();
   if (msLeft > 0) {
@@ -216,10 +216,11 @@ function updateClearLockCountdownText() {
   }
 }
 
+// Button "Leeren" löscht das Canvas und setzt den Zustand zurück
 clearBtn.addEventListener('click', () => {
   context.clearRect(0, 0, canvas.width, canvas.height);
   touches.clear();
-  hasDrawnSinceClear = false; 
+  hasDrawnSinceClear = false;
   updateClearButtonState();
   sendRequest('*broadcast-message*', ['clear']);
 });
@@ -227,6 +228,8 @@ clearBtn.addEventListener('click', () => {
 // =====================
 // 6. Chat-Funktionen
 // =====================
+
+// Sendet eine Chat-Nachricht an alle
 function sendChatMessage() {
   const text = messageInput.value.trim();
   if (text.length > 0) {
@@ -250,10 +253,13 @@ messageInput.addEventListener('keydown', (e) => {
 // =====================
 // 7. Farbwahl-Logik
 // =====================
+
+// Öffnet den Farbwähler
 colorPickerBtn.addEventListener('click', () => {
   colorPicker.click();
 });
 
+// Aktualisiert das Farbsymbol
 function updateColorIcon() {
   colorPickerPath.setAttribute('fill', colorPicker.value);
 }
@@ -268,7 +274,7 @@ const socket = new WebSocket(webRoomsWebSocketServerAddr);
 socket.addEventListener('open', () => {
   sendRequest('*enter-room*', 'interactive-chat');
   sendRequest('*subscribe-client-count*');
-  setInterval(() => socket.send(''), 30000);
+  setInterval(() => socket.send(''), 30000); // Ping, damit Verbindung offen bleibt
 });
 
 socket.addEventListener("close", () => {
@@ -277,6 +283,7 @@ socket.addEventListener("close", () => {
   sendRequest('*broadcast-message*', ['end', clientId]);
 });
 
+// Verarbeitung eingehender Nachrichten vom Server
 socket.addEventListener('message', (event) => {
   const data = event.data;
   if (data.length > 0) {
@@ -322,7 +329,7 @@ socket.addEventListener('message', (event) => {
       }
       case 'clear': {
         touches.clear();
-        hasDrawnSinceClear = false; // zurücksetzen auch bei remote-Leeren
+        hasDrawnSinceClear = false;
         updateClearButtonState();
         break;
       }
@@ -363,6 +370,7 @@ socket.addEventListener('message', (event) => {
         const targetId = incoming[1];
         const allLines = incoming[2];
         if (clientId === targetId) {
+          resizeCanvas();
           touches.clear();
           for (const line of allLines) {
             if (!touches.has(line.id)) touches.set(line.id, []);
@@ -412,6 +420,8 @@ socket.addEventListener('message', (event) => {
 // =====================
 // 9. Hilfsfunktionen
 // =====================
+
+// Sendet eine Nachricht an den Server
 function sendRequest(...message) {
   const str = JSON.stringify(message);
   socket.send(str);
