@@ -1,0 +1,313 @@
+/* Grundlegende Schrift und Farben */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+  background: linear-gradient(135deg, #f8ffae 0%, #b6e9ff 100%);
+  min-height: 100vh;
+  color: #222;
+}
+
+/* Header */
+#chat-container {
+  background: linear-gradient(90deg,#fdc4b1 0%, #ffecd2 50%, #fdc4b1 100%);
+  padding: 0.7rem 1rem 0.5rem 1rem;
+  border-bottom-left-radius: 1.2rem;
+  border-bottom-right-radius: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+#chat-container h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #ff6a00;
+  text-shadow: 1px 2px 8px #fff7;
+}
+
+/* Flex-Layout */
+.main-flex {
+  display: flex;
+  gap: 1rem; /* vorher 2rem, jetzt kleinerer Abstand */
+  justify-content: center;
+  align-items: stretch; /* Spalten gleich hoch */
+  padding: 0 1rem 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  flex-wrap: nowrap;    /* Kein Umbruch, damit Höhe übernommen wird */
+}
+
+/* Canvas-Spalte */
+.canvas-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 2 1 400px;
+  min-width: 320px;
+}
+
+#canvas {
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px 0 #43cea255;
+  background: #fff;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  aspect-ratio: 16/10;
+  max-height: 420px; /* NEU: maximale Höhe reduziert */
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: flex-end; /* vorher center, jetzt flex-end für vertikale Ausrichtung unten */
+  margin-bottom: 1rem;
+  background: #fff; /* Weißer Hintergrund */
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 8px #43cea244;
+  padding: 0.7rem 1.2rem;
+  width: 100%;         /* Neu: immer so breit wie das Canvas */
+  max-width: 800px;    /* Neu: exakt wie das Canvas */
+  box-sizing: border-box;
+}
+
+.controls button,
+#send-button {
+  background: linear-gradient(90deg, #28b849 0%, #2bcb36 50%, #28b849 100%);
+  color: #ffffffed;
+  border: none;
+  border-radius: 1.2rem;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #43cea244;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.controls button:hover,
+#send-button:hover {
+  background: linear-gradient(90deg, #004705 0%, #0b6a01 50%, #004705 100%);
+  color: #ffffff;
+  transform: translateY(+1px) scale(0.98);
+}
+
+.controls button:disabled,
+#send-button:disabled,
+#clearBtn:disabled {
+  background: #cccccc !important;
+  color: #888888 !important;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+#colorPicker {
+  border: none;
+  outline: none;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px #43cea244;
+  cursor: pointer;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: none;
+  overflow: hidden;
+}
+
+/* Für Webkit-Browser: Farbfeld rund und vollflächig */
+#colorPicker::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+}
+#colorPicker::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+}
+
+/* Für Firefox: Farbfeld rund und vollflächig */
+#colorPicker::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+}
+
+/* Chat-Spalte */
+.chat-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 320px;
+  min-width: 260px;
+  max-width: 400px;
+  height: 100%;
+  min-height: 0;
+  width: 100%; 
+  box-sizing: border-box;
+}
+
+#messages {
+  flex: 1 1 auto;
+  margin-bottom: 1rem;
+  height: 100%;
+  max-height: 420px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#messages-textarea {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border-radius: 1rem;
+  border: none;
+  padding: 1rem;
+  font-size: 1rem;
+  background: rgb(221, 255, 236);
+  backdrop-filter: blur(6px);
+  color: #222;
+  resize: none;
+  box-shadow: 0 2px 8px #43cea244;
+  flex: 1 1 auto;
+  min-height: 80px;
+  max-height: 420px; /* angepasst: gleiche maximale Höhe wie das Canvas */
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+#input-row {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%; /* Neu: volle Breite */
+  box-sizing: border-box;
+}
+
+#message-input {
+  flex: 1 1 auto;
+  border-radius: 1rem;
+  border: none;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 8px #43cea244;
+  width: 100%; /* Neu: volle Breite */
+  box-sizing: border-box;
+}
+
+#send-button {
+  min-width: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%; /* optional, sorgt für gleichmäßige Höhe */
+}
+
+#clearBtn {
+  height: 32px;
+  min-width: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  padding: 0 1.4rem;
+  box-sizing: border-box;
+}
+
+#client-index {
+  color: #704410;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* Brush Size Icons */
+.brush-size-icon {
+  vertical-align: middle;
+  opacity: 0.25; /* Neu: macht die Icons halbtransparent */
+}
+.brush-size-icon-small {
+  width: 16px;
+  height: 16px;
+  transition: width 0.2s, height 0.2s;
+}
+.brush-size-icon-large {
+  width: 32px;
+  height: 32px;
+  transition: width 0.2s, height 0.2s;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .main-flex {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+  .canvas-column, .chat-column {
+    max-width: 100%;
+  }
+  .chat-column {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  #chat-container h1 {
+    font-size: 1.3rem;
+  }
+  .controls button,
+  #send-button {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+  }
+  #canvas {
+    max-width: 100vw;
+    min-width: 0;
+  }
+  .main-flex {
+    padding: 0 0.2rem;
+  }
+  #messages-textarea {
+    min-height: 120px;
+    font-size: 0.95rem;
+    padding: 0.7rem;
+  }
+  #message-input {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.7rem;
+  }
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+#colorPickerBtn svg {
+  display: block;
+  transition: filter 0.2s;
+}
+#colorPickerBtn:active svg {
+  filter: brightness(0.8);
+}
+
+.controls-label {
+  font-size: 0.85rem;
+  text-align: center;
+  color: #333;
+  margin-bottom: 0.2rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
