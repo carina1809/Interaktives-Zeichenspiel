@@ -67,8 +67,8 @@ function onPointerDown(e) {
   if (pointerId === null) {
     pointerId = e.pointerId;
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / canvas.width;
-    const y = (e.clientY - rect.top) / canvas.height;
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
     if (!touches.has(clientId)) touches.set(clientId, []);
     const color = colorPicker.value;
     const size = parseInt(document.getElementById('brushSize').value, 10);
@@ -79,7 +79,7 @@ function onPointerDown(e) {
     // Sperre nur setzen, wenn Canvas frisch geleert wurde:
     if (!hasDrawnSinceClear && clearLockedUntil < Date.now()) {
       hasDrawnSinceClear = true;
-      const lockUntil = Date.now() + 90000; // 90 Sekunden Sperrzeit
+      const lockUntil = Date.now() + 90000; // 80 Sekunden Sperrzeit
       sendRequest('*broadcast-message*', ['clear-lock', lockUntil]);
       lockClearButtonUntil(lockUntil);
     }
@@ -91,8 +91,8 @@ function onPointerMove(e) {
   if (e.pointerId === pointerId && currentLine) {
     e.preventDefault();
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / canvas.width;
-    const y = (e.clientY - rect.top) / canvas.height;
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
     currentLine.points.push({ x, y });
     sendRequest('*broadcast-message*', ['move', clientId, x, y]);
   }
