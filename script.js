@@ -123,14 +123,17 @@ function onPointerUp(e) {
 function onAnimationFrame() {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Alle Linien sammeln
+  // Alle Linien aus allen Clients in ein Array sammeln
   let allLines = [];
   for (let lines of touches.values()) {
-    allLines = allLines.concat(lines);
+    for (let line of lines) {
+      allLines.push(line);
+    }
   }
   // Nach createdAt sortieren (älteste zuerst, neueste zuletzt)
   allLines.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
+  // Jetzt in dieser Reihenfolge zeichnen
   for (let line of allLines) {
     if (line.points.length > 1) {
       context.save();
