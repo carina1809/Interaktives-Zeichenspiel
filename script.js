@@ -79,7 +79,7 @@ function onPointerDown(e) {
     // Sperre nur setzen, wenn Canvas frisch geleert wurde:
     if (!hasDrawnSinceClear && clearLockedUntil < Date.now()) {
       hasDrawnSinceClear = true;
-      const lockUntil = Date.now() + 80000; // 80 Sekunden Sperrzeit
+      const lockUntil = Date.now() + 90000; // 90 Sekunden Sperrzeit
       sendRequest('*broadcast-message*', ['clear-lock', lockUntil]);
       lockClearButtonUntil(lockUntil);
     }
