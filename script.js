@@ -84,10 +84,10 @@ function onPointerDown(e) {
     if (!touches.has(clientId)) touches.set(clientId, []);
     const color = colorPicker.value;
     const size = parseInt(document.getElementById('brushSize').value, 10);
-    currentLine = { points: [{ x, y }], color, size };
+    const now = Date.now();
+    currentLine = { points: [{ x, y }], color, size, createdAt: now };
     touches.get(clientId).push(currentLine);
-    updateClearButtonState();
-    sendRequest('*broadcast-message*', ['start', clientId, x, y, color, size]);
+    sendRequest('*broadcast-message*', ['start', clientId, x, y, color, size, now]);
     // Sperre nur setzen, wenn Canvas frisch geleert wurde:
     if (!hasDrawnSinceClear && clearLockedUntil < Date.now()) {
       hasDrawnSinceClear = true;
@@ -123,18 +123,14 @@ function onPointerUp(e) {
 function onAnimationFrame() {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Alle Linien in ein Array sammeln und nach Erstellungszeit sortieren
+  // Alle Linien sammeln
   let allLines = [];
   for (let lines of touches.values()) {
     allLines = allLines.concat(lines);
   }
-  // Die zuletzt hinzugefügten Linien sollen oben liegen
-  for (let i = 0; i < allLines.length; i++) {
-    allLines[i]._order = i;
-  }
-  allLines.sort((a, b) => a._order - b._order); // Optional, falls Reihenfolge wichtig
+  // Nach createdAt sortieren (älteste zuerst, neueste zuletzt)
+  allLines.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
-  // Von unten nach oben zeichnen (älteste zuerst, neueste zuletzt)
   for (let line of allLines) {
     if (line.points.length > 1) {
       context.save();
@@ -301,8 +297,9 @@ socket.addEventListener('message', (event) => {
         const y = incoming[3];
         const color = incoming[4] || '#000';
         const size = incoming[5] || 3;
+        const createdAt = incoming[6] || Date.now();
         if (!touches.has(id)) touches.set(id, []);
-        touches.get(id).push({ points: [{ x, y }], color, size });
+        touches.get(id).push({ points: [{ x, y }], color, size, createdAt });
         updateClearButtonState();
         break;
       }
@@ -368,7 +365,8 @@ socket.addEventListener('message', (event) => {
             touches.get(line.id).push({
               points: line.points,
               color: line.color,
-              size: line.size
+              size: line.size,
+              createdAt: line.createdAt || Date.now()
             });
           }
           updateClearButtonState();
