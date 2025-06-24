@@ -84,10 +84,11 @@ function onPointerDown(e) {
     if (!touches.has(clientId)) touches.set(clientId, []);
     const color = colorPicker.value;
     const size = parseInt(document.getElementById('brushSize').value, 10);
-    currentLine = { points: [{ x, y }], color, size };
+    const createdAt = Date.now();
+    currentLine = { points: [{ x, y }], color, size, createdAt };
     touches.get(clientId).push(currentLine);
     updateClearButtonState();
-    sendRequest('*broadcast-message*', ['start', clientId, x, y, color, size]);
+    sendRequest('*broadcast-message*', ['start', clientId, x, y, color, size, createdAt]);
     // Sperre nur setzen, wenn Canvas frisch geleert wurde:
     if (!hasDrawnSinceClear && clearLockedUntil < Date.now()) {
       hasDrawnSinceClear = true;
@@ -122,21 +123,31 @@ function onPointerUp(e) {
 
 function onAnimationFrame() {
   context.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Alle Linien aus allen Clients in ein Array sammeln
+  let allLines = [];
   for (let lines of touches.values()) {
     for (let line of lines) {
-      if (line.points.length > 1) {
-        context.save();
-        context.strokeStyle = line.color || '#000';
-        context.lineWidth = line.size || 3;
-        context.lineCap = 'round';
-        context.beginPath();
-        context.moveTo(line.points[0].x * canvas.width, line.points[0].y * canvas.height);
-        for (let i = 1; i < line.points.length; i++) {
-          context.lineTo(line.points[i].x * canvas.width, line.points[i].y * canvas.height);
-        }
-        context.stroke();
-        context.restore();
+      allLines.push(line);
+    }
+  }
+  // Nach createdAt sortieren (älteste zuerst, neueste zuletzt)
+  allLines.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+  // Jetzt in dieser Reihenfolge zeichnen
+  for (let line of allLines) {
+    if (line.points.length > 1) {
+      context.save();
+      context.strokeStyle = line.color || '#000';
+      context.lineWidth = line.size || 3;
+      context.lineCap = 'round';
+      context.beginPath();
+      context.moveTo(line.points[0].x * canvas.width, line.points[0].y * canvas.height);
+      for (let i = 1; i < line.points.length; i++) {
+        context.lineTo(line.points[i].x * canvas.width, line.points[i].y * canvas.height);
       }
+      context.stroke();
+      context.restore();
     }
   }
   requestAnimationFrame(onAnimationFrame);
@@ -290,8 +301,9 @@ socket.addEventListener('message', (event) => {
         const y = incoming[3];
         const color = incoming[4] || '#000';
         const size = incoming[5] || 3;
+        const createdAt = incoming[6] || Date.now();
         if (!touches.has(id)) touches.set(id, []);
-        touches.get(id).push({ points: [{ x, y }], color, size });
+        touches.get(id).push({ points: [{ x, y }], color, size, createdAt });
         updateClearButtonState();
         break;
       }
@@ -357,7 +369,8 @@ socket.addEventListener('message', (event) => {
             touches.get(line.id).push({
               points: line.points,
               color: line.color,
-              size: line.size
+              size: line.size,
+              createdAt: line.createdAt || Date.now()
             });
           }
           updateClearButtonState();
