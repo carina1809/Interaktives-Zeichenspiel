@@ -122,21 +122,32 @@ function onPointerUp(e) {
 
 function onAnimationFrame() {
   context.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Alle Linien in ein Array sammeln und nach Erstellungszeit sortieren
+  let allLines = [];
   for (let lines of touches.values()) {
-    for (let line of lines) {
-      if (line.points.length > 1) {
-        context.save();
-        context.strokeStyle = line.color || '#000';
-        context.lineWidth = line.size || 3;
-        context.lineCap = 'round';
-        context.beginPath();
-        context.moveTo(line.points[0].x * canvas.width, line.points[0].y * canvas.height);
-        for (let i = 1; i < line.points.length; i++) {
-          context.lineTo(line.points[i].x * canvas.width, line.points[i].y * canvas.height);
-        }
-        context.stroke();
-        context.restore();
+    allLines = allLines.concat(lines);
+  }
+  // Die zuletzt hinzugefügten Linien sollen oben liegen
+  for (let i = 0; i < allLines.length; i++) {
+    allLines[i]._order = i;
+  }
+  allLines.sort((a, b) => a._order - b._order); // Optional, falls Reihenfolge wichtig
+
+  // Von unten nach oben zeichnen (älteste zuerst, neueste zuletzt)
+  for (let line of allLines) {
+    if (line.points.length > 1) {
+      context.save();
+      context.strokeStyle = line.color || '#000';
+      context.lineWidth = line.size || 3;
+      context.lineCap = 'round';
+      context.beginPath();
+      context.moveTo(line.points[0].x * canvas.width, line.points[0].y * canvas.height);
+      for (let i = 1; i < line.points.length; i++) {
+        context.lineTo(line.points[i].x * canvas.width, line.points[i].y * canvas.height);
       }
+      context.stroke();
+      context.restore();
     }
   }
   requestAnimationFrame(onAnimationFrame);
