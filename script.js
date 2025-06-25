@@ -355,7 +355,8 @@ socket.addEventListener('message', (event) => {
       }
       case 'request-canvas': {
         const targetId = incoming[1];
-        if (clientId === 1 && touches.size > 0) {
+        // Jeder Client mit Daten antwortet, nicht nur clientId === 1
+        if (touches.size > 0) {
           const allLines = [];
           for (const [id, lines] of touches.entries()) {
             for (const line of lines) {
@@ -371,17 +372,19 @@ socket.addEventListener('message', (event) => {
         const allLines = incoming[2];
         if (clientId === targetId) {
           resizeCanvas();
-          touches.clear();
-          for (const line of allLines) {
-            if (!touches.has(line.id)) touches.set(line.id, []);
-            touches.get(line.id).push({
-              points: line.points,
-              color: line.color,
-              size: line.size,
-              createdAt: line.createdAt || Date.now()
-            });
-          }
-          updateClearButtonState();
+          setTimeout(() => {
+            touches.clear(); // <-- jetzt erst hier!
+            for (const line of allLines) {
+              if (!touches.has(line.id)) touches.set(line.id, []);
+              touches.get(line.id).push({
+                points: line.points,
+                color: line.color,
+                size: line.size,
+                createdAt: line.createdAt || Date.now()
+              });
+            }
+            updateClearButtonState();
+          }, 50);
         }
         break;
       }
