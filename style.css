@@ -265,38 +265,38 @@ body {
 }
 
 @media (max-width: 600px) {
-  #chat-container h1 {
-    font-size: 1.3rem;
+  html, body {
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+    touch-action: none;
   }
-  .controls button,
-  #send-button {
-    font-size: 0.95rem;
-    padding: 0.5rem 1rem;
+  body {
+    overflow: hidden;
+    position: fixed;
+    width: 100vw;
+  }
+  .main-flex {
+    height: calc(100vh - 70px); /* 70px = ungefährer Header, ggf. anpassen */
+    min-height: 0;
+    max-height: 100vh;
+    overflow: hidden;
+  }
+  .canvas-column,
+  .chat-column {
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
   }
   #canvas {
-    max-width: 100vw;
-    min-width: 0;
-    max-height: 35vh; /* NEU: Canvas passt sich der Bildschirmhöhe an */
+    max-height: 35vh;
+    min-height: 0;
   }
   #messages,
   #messages-textarea {
-    max-height: 25vh; /* NEU: Chatfeld passt sich der Bildschirmhöhe an */
-  }
-  .main-flex {
-    padding: 0 0.2rem;
-    gap: 0.2rem; /* Abstand zwischen Canvas und Chat-Spalte weiter verkleinert */
-  }
-  .canvas-column {
-    margin-bottom: 0.2rem; /* Optional: Abstand nach unten noch kleiner */
-  }
-  #messages-textarea {
-    min-height: 120px;
-    font-size: 0.95rem;
-    padding: 0.7rem;
-  }
-  #message-input {
-    font-size: 0.95rem;
-    padding: 0.5rem 0.7rem;
+    max-height: 25vh;
+    min-height: 0;
   }
 }
 
