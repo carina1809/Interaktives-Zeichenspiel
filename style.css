@@ -124,8 +124,6 @@ body {
   -webkit-appearance: none;
   -moz-appearance: none;
 }
-
-/* Verhindert native Farbfeld-Anzeige in allen Browsern */
 #colorPicker::-webkit-color-swatch-wrapper,
 #colorPicker::-webkit-color-swatch,
 #colorPicker::-moz-color-swatch {
